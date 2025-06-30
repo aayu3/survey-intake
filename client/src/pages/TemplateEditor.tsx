@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { surveyTemplateSchema, type SurveyTemplate } from '../types/surveyTemplate'
 import PasswordPopup from '../components/PasswordPopup'
+import { useAuth } from '../context/AuthContext'
 
 export default function TemplateEditor() {
+  const {idToken} = useAuth() 
   const [isAdmin, setIsAdmin] = useState(false)
-  const [showPasswordPopup, setShowPasswordPopup] = useState(false)
+  const [showPasswordPopup, setShowPasswordPopup] = useState(true)
   const [template, setTemplate] = useState<string>(
     `{
       "title": "Test Template",
@@ -56,10 +58,11 @@ export default function TemplateEditor() {
     if (!parsedTemplate) return;
     
     try {
-      const response = await fetch("http://localhost:4000/template", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/template`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${idToken}`
         },
         body: JSON.stringify(parsedTemplate),
       });

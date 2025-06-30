@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 interface SurveyTemplateResponse {
   id: string
   title: string
@@ -16,6 +17,7 @@ export default function Home() {
   const [templates, setTemplates] = useState<SurveyTemplateResponse[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const {idToken} = useAuth()
 
 
   useEffect(() => {
@@ -24,7 +26,7 @@ export default function Home() {
 
   const fetchTemplates = async () => {
     try {
-      const response = await fetch('http://localhost:4000/templates')
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/templates`)
       if (!response.ok) {
         throw new Error('Failed to fetch templates')
       }
@@ -90,14 +92,20 @@ export default function Home() {
               <h1 className="text-3xl font-bold text-gray-900">Survey Dashboard</h1>
               <p className="text-gray-600 mt-1">Manage and view your surveys</p>
             </div>
-            <div className="flex gap-3">
-              <Link
-                to="/create"
-                className="bg-brand hover:bg-brand/90 text-white font-medium px-6 py-3 rounded-xl shadow-soft hover:shadow-lg transition-all duration-200 ease-in-out transform hover:scale-105"
-              >
-                Create New Survey
-              </Link>
-            </div>
+                          <div className="flex gap-3">
+                <Link
+                  to="/signup"
+                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-6 py-3 rounded-xl transition-all duration-200"
+                >
+                  Sign Up
+                </Link>
+                <Link
+                  to="/create"
+                  className="bg-brand hover:bg-brand/90 text-white font-medium px-6 py-3 rounded-xl shadow-soft hover:shadow-lg transition-all duration-200 ease-in-out transform hover:scale-105"
+                >
+                  Create New Survey
+                </Link>
+              </div>
           </div>
         </div>
       </header>

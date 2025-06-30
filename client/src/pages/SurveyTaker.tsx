@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 interface Question {
   type: 'text' | 'multipleChoice'
@@ -23,7 +24,7 @@ interface Answer {
 export default function SurveyTaker() {
   const { templateId } = useParams<{ templateId: string }>()
   const navigate = useNavigate()
-  
+  const {idToken} = useAuth()
   const [survey, setSurvey] = useState<SurveyTemplate | null>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [answers, setAnswers] = useState<Answer[]>([])
@@ -35,7 +36,11 @@ export default function SurveyTaker() {
 
   const fetchSurvey = async () => {
     if (templateId) {
-      await fetch(`http://localhost:4000/template/${templateId}`)
+      await fetch(`${import.meta.env.VITE_API_URL}/template/${templateId}`, {
+        headers: {
+          "Authorization": `Bearer ${idToken}`
+        }
+      })
         .then(res => res.json())
         .then(data => setSurvey(data))
         .catch(err => setError(err.message))
