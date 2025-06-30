@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id      String @id @db.VarChar(64)
+  email   String 
+  createdAt   DateTime @default(now())
+  profile   UserProfile?
+
+  responses SurveyResponse[]
+}
+
+model UserProfile {
+  userId String @id
+  firstName String
+  lastName String
+  phone String?
+  dateOfBirth DateTime?
+  heightCm Int?
+  weightKg Int?
+  address1 String?
+  address2 String?
+  city String?
+  state String?
+  postalCode String?
+  country String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SurveyTemplate {
+  id String @id @default(uuid())
+  title String
+  description String?
+  form Json
+  version Int @default(1)
+  isActive Boolean @default(true)
+
+  createdBy String?
+
+  createdAt DateTime @default(now())
+  responses SurveyResponse[]
+}
+
+model SurveyResponse {
+  id String @id @default(uuid())
+  templateId String
+  userId String
+  status String
+  answer Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  template SurveyTemplate @relation(fields: [templateId], references:[id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([templateId])
+  // @@unique([templateId, userId])
+}

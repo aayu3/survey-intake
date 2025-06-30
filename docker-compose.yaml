@@ -1,0 +1,14 @@
+version: '1'
+services:
+  db:
+    image: postgres:16
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: waterlily
+      POSTGRES_PASSWORD: waterlily
+      POSTGRES_DB: waterlily
+    volumes:
+      - waterlily-db-data:/var/lib/postgresql/data
+volumes:
+  waterlily-db-data:
