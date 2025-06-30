@@ -70,7 +70,7 @@ export default function Login() {
 
         try {
             await login(email, password);
-            navigate("/home");
+            navigate("/");
         } catch (error) {
             setErrors({ 
                 general: error instanceof Error ? error.message : "An unknown error occurred" 

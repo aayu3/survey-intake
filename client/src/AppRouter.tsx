@@ -1,5 +1,4 @@
-
-import {  Routes, Route } from "react-router-dom";
+import {  Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import TemplateEditor from "./pages/TemplateEditor";
 import SurveyTaker from "./pages/SurveyTaker";
@@ -18,6 +17,7 @@ export default function AppRouter() {
             <Route path="/survey/:templateId?" element={<RequireAuth><SurveyTaker /></RequireAuth>} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
+            <Route path="*" element={<Navigate to="/" />} />
         </Routes>
         </AuthProvider>
 

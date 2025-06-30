@@ -17,7 +17,7 @@ export default function Home() {
   const [templates, setTemplates] = useState<SurveyTemplateResponse[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const {idToken} = useAuth()
+  const {idToken, logout} = useAuth()
 
 
   useEffect(() => {
@@ -26,7 +26,11 @@ export default function Home() {
 
   const fetchTemplates = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/templates`)
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/templates`, {
+        headers: {
+          "Authorization": `Bearer ${idToken}`
+        }
+      })
       if (!response.ok) {
         throw new Error('Failed to fetch templates')
       }
@@ -93,12 +97,7 @@ export default function Home() {
               <p className="text-gray-600 mt-1">Manage and view your surveys</p>
             </div>
                           <div className="flex gap-3">
-                <Link
-                  to="/signup"
-                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-6 py-3 rounded-xl transition-all duration-200"
-                >
-                  Sign Up
-                </Link>
+                <button className="bg-brand hover:bg-brand/90 text-white font-medium px-6 py-3 rounded-xl shadow-soft hover:shadow-lg transition-all duration-200 ease-in-out transform hover:scale-105" onClick={() => logout()}>Logout</button>
                 <Link
                   to="/create"
                   className="bg-brand hover:bg-brand/90 text-white font-medium px-6 py-3 rounded-xl shadow-soft hover:shadow-lg transition-all duration-200 ease-in-out transform hover:scale-105"
