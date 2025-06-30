@@ -18,7 +18,21 @@ const templateSchema = z.object({
 
 app.get("/health", (req, res) => res.send("OK"));
 
-app.post("tempaltes", async (req, res) => {
+app.get("/templates", async (req, res) => {
+  try {
+    const templates = await prisma.surveyTemplate.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+      where: {isActive: true},
+    });
+    res.json(templates);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post("/template", async (req, res) => {
   try {
     const body = templateSchema.parse(req.body);
     const template = await prisma.surveyTemplate.create({
@@ -31,6 +45,17 @@ app.post("tempaltes", async (req, res) => {
     res.status(201).json(template);
   } catch (error) {
     res.status(400).json({ error: error.message });
+  }
+});
+
+app.get("/template/:id", async (req, res) => {
+  try { 
+    const template = await prisma.surveyTemplate.findUnique({
+      where: { id: req.params.id, isActive: true },
+    });
+    res.json(template);
+  } catch (error) {
+    res.status(404).json({ error: "Template not found" });
   }
 });
 
