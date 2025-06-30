@@ -92,12 +92,6 @@ export default function Home() {
             </div>
             <div className="flex gap-3">
               <Link
-                to="/survey"
-                className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-6 py-3 rounded-xl transition-all duration-200"
-              >
-                Try Demo Survey
-              </Link>
-              <Link
                 to="/create"
                 className="bg-brand hover:bg-brand/90 text-white font-medium px-6 py-3 rounded-xl shadow-soft hover:shadow-lg transition-all duration-200 ease-in-out transform hover:scale-105"
               >
@@ -168,12 +162,9 @@ export default function Home() {
                     <div className="flex gap-2">
                       <button 
                         onClick={() => navigate(`/survey/${template.id}`)} 
-                        className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors"
+                        className="flex-1 bg-brand hover:bg-brand/90 text-white font-medium py-2 px-4 rounded-lg transition-colors"
                       >
                         Take Survey
-                      </button>
-                      <button className="flex-1 bg-brand hover:bg-brand/90 text-white font-medium py-2 px-4 rounded-lg transition-colors">
-                        Edit
                       </button>
                     </div>
                   </div>

@@ -198,16 +198,21 @@ export default function SurveyTaker() {
       {/* Header */}
       <header className="bg-white shadow-sm border-b p-4">
         <div className="max-w-3xl mx-auto flex justify-between items-center">
+        <button onClick={() => navigate('/')} className="bg-brand hover:bg-brand/90 text-white px-4 py-2 rounded-lg transition-colors">
+          Back to Home
+        </button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{survey.title}</h1>
             {survey.description && (
               <p className="text-gray-600">{survey.description}</p>
             )}
           </div>
+          
           <div className="text-sm text-gray-500">
             Question {currentQuestionIndex + 1} of {survey.form.length}
           </div>
         </div>
+        
       </header>
 
       {/* Question Content */}
