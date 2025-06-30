@@ -22,6 +22,12 @@ const templateSchema = z.object({
   form: z.any(),
 });
 
+const responseSchema = z.object({
+  templateId: z.string().min(1),
+  answers: z.any(),
+  status: z.string().min(1),
+});
+
 async function requireAuth(req, res, next) {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) {
@@ -91,6 +97,61 @@ app.post("/user", requireAuth, async (req, res) => {``
     res.status(201).json(user);
   } catch (error) {
     res.status(400).json({ error: error.message });
+  }
+});
+
+app.post("/submit", requireAuth, async (req, res) => {
+  try {
+    console.log("body", req.body)
+    const body = responseSchema.parse(req.body);
+    const existing = await prisma.surveyResponse.findFirst({
+      where: {
+        templateId: body.templateId,
+        userId: req.uid,
+      },
+    });
+
+    let saved;
+    if (existing) {
+      saved = await prisma.surveyResponse.update({
+        where: {id: existing.id},
+        data: {
+          answer: body.answers,
+          status: body.status,
+        },
+      });
+    } else {
+      saved = await prisma.surveyResponse.create({
+        data: {
+          templateId: body.templateId,
+          userId: req.uid,
+          answer: body.answers,
+          status: body.status,
+        },
+      });
+    }
+
+    return res.status(201).json(saved);
+  } catch (error) {
+    console.log("Submit error:", error);
+    return res.status(400).json({ error: error.message });
+  }
+});
+
+app.get("/responses/:templateId", requireAuth, async (req, res) => {    
+  try {
+    const responses = await prisma.surveyResponse.findFirst({
+      where: {
+        templateId: req.params.templateId,
+        userId: req.uid,
+      },
+    });
+    if (!responses) {
+      return res.status(404).json({ error: "Responses not found" });
+    }
+    return res.status(200).json(responses);
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
   }
 });
 

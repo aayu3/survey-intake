@@ -34,6 +34,8 @@ export default function SurveyTaker() {
   const [isSubmitted, setIsSubmitted] = useState(false)
 
 
+
+
   const fetchSurvey = async () => {
     if (templateId) {
       await fetch(`${import.meta.env.VITE_API_URL}/template/${templateId}`, {
@@ -54,6 +56,8 @@ export default function SurveyTaker() {
 
   useEffect(() => {
     // Load the current answer when question changes
+    if (!survey) return;
+
     if (survey && answers.length > 0) {
       const currentQ = survey.form[currentQuestionIndex]
       const existingAnswer = answers.find(a => a.question === currentQ.question)
@@ -70,6 +74,27 @@ export default function SurveyTaker() {
       } catch (err) {
         console.error('Failed to parse saved answers:', err)
       }
+    } else {
+        const fetchSavedAnswers = async () => {
+            if (!idToken) return;
+            try{
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/responses/${templateId}`, {
+                    headers: {
+                        "Authorization": `Bearer ${idToken}`
+                    }
+                })
+                if (!response.ok) {
+                    return;
+                }
+
+                const data = await response.json()
+                console.log("data", data)
+                setAnswers(data.answer)
+            } catch (err) {
+                console.error('Failed to fetch saved answers:', err)
+            }
+        }
+    fetchSavedAnswers()
     }
   }, [templateId]);
 
@@ -111,10 +136,52 @@ export default function SurveyTaker() {
     }
   }
 
-  const handleSubmit = () => {
-    saveAnswer()
-    setIsSubmitted(true)
-    // Optionally, you could also send the answers to your server here
+  const handleSubmit = async () => {
+    if (!idToken) return;
+    if (!survey) return;
+    
+    // Get the current answers with the current answer included
+    const currentQuestion = survey.form[currentQuestionIndex]
+    let finalAnswers = [...answers]
+    
+    if (currentAnswer.trim()) {
+      const existingIndex = finalAnswers.findIndex(a => a.question === currentQuestion.question)
+      const answerObj: Answer = {
+        question: currentQuestion.question,  
+        answer: currentAnswer
+      }
+      
+      if (existingIndex >= 0) {
+        finalAnswers[existingIndex] = answerObj
+      } else {
+        finalAnswers.push(answerObj)
+      }
+    }
+    
+    let status = 'draft'
+    if (finalAnswers.length === survey.form.length ) {
+      status = 'submitted'
+    }
+    try{
+        await fetch(`${import.meta.env.VITE_API_URL}/submit`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`
+            },
+            body: JSON.stringify({
+                templateId: survey.id,
+                answers: finalAnswers,
+                status: status,
+            })
+        })
+        localStorage.removeItem(`survey-answers-${survey.id}`)
+    } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred')
+    } finally {
+        setIsSubmitted(true)
+    }
+    
   }
 
   const handleRestart = () => {
